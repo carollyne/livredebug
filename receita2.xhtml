@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"  
+      xmlns:f="http://java.sun.com/jsf/core"  
+      xmlns:ui="http://java.sun.com/jsf/facelets"  
+      xmlns:p="http://primefaces.org/ui" 
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <h:head>
+        <title>TODO supply a title</title>
+        
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:autoComplete id="event" value="#{receitaController.paramFiltro}" size="40" completeMethod="#{receitaController.completeText}" >
+            
+            </p:autoComplete>&#160;              
+            <p:dataTable id="dtTabela" value="#{receitaController.objLista}" var="receita" paginatorPosition="bottom"
+                             emptyMessage="Nenhum registro foi encontrado" paginator="true" rows="25" rowKey="#{receita.id}"
+                             selection="#{receitaController.selectedParcelas}" style="clear: both !important; position: relative; display: inline-block !important;">
+                    <f:facet name="header"><h:outputText value=" "/></f:facet>
+
+                    <p:column selectionMode="multiple" style="width:3%;" />
+                    
+                    <p:column sortBy="#{receita.data}" headerText="Data" width="10%"  priority="2">
+                        #{receitaController.formataData(receita.data)}
+                    </p:column>
+                    <p:column sortBy="#{receita.descricao}" headerText="Nome" priority="1">
+                        <p:commandLink id="comlink" value="#{receita.descricao}" actionListener="#{receitaController.editar(receita)}" oncomplete="PF('dlgAltera').show();" />
+                    </p:column>
+                    <p:column sortBy="#{receita.numdoc}" headerText="Doc." width="10%" priority="3">
+                        #{receita.numdoc}
+                    </p:column>
+
+                    <p:column sortBy="#{receita.quitado}" headerText="Status" width="10%" priority="3">
+                        <img src="icones/${receitaController.formataImage(receita.data, receita.quitado)}.png" style="border: 0px solid !important; height: 18px;"/>
+                    </p:column>
+
+                    <p:column sortBy="#{receita.valor}" headerText="Valor" priority="1">
+                        <p:outputLabel value="#{receita.valor}">
+                            <f:convertNumber type="currency" currencySymbol="R$"/>
+                        </p:outputLabel>                                          
+                    </p:column>     
+                    <p:column headerText="Recibo" width="5%" priority="3">
+                        <p:commandLink ajax="false" disabled="#{!receita.quitado}">
+                            <img src="icones\print.png" style="border: 0px solid !important; width: 18px; height: 18px;"></img>
+                            <p:fileDownload value="#{receitaController.exibirReciboReceita(receita)}"/>
+                        </p:commandLink>
+                    </p:column> 
+                    <p:column headerText="Enviar" width="5%" priority="3">
+                        <p:commandLink id="email2" actionListener="#{receitaController.gerarBoleto(receita, true)}"  disabled="#{receita.quitado}">
+                            <img src="icones\email36.png" style="border: 0px solid !important; width: 18px; height: 18px;"></img>
+                        </p:commandLink>
+                        <p:blockUI block="dtTabela" trigger="email2" >Enviando...</p:blockUI>
+                    </p:column>    
+                    <p:column headerText="PDF" width="5%" priority="3">
+                        <p:commandLink ajax="false"  disabled="#{receita.quitado}">
+                            <img src="icones/pdf.png" style="border: 0px solid !important; width: 18px; height: 18px;"></img>
+                            <p:fileDownload value="#{receitaController.gerarBoleto(receita, false)}"/>
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Seleção" width="30px" rendered="#{receitaController.dlgConsulta}" priority="3">  
+                            <p:commandButton icon="ui-icon-search" actionListener="#{receitaController.SelecaoDoDialog(receita)}" />  
+                    </p:column>
+                </p:dataTable>        
+        </h:form>            
+    </h:body>
+</html>
